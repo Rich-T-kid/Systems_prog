@@ -1,4 +1,3 @@
-// first comments
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +6,7 @@ struct Dimensions{
     int rows;
     int cols;
 };
+
 int sizecsv(FILE *file, struct Dimensions *obj) {
     char line[1024];
     int rows = 0;
@@ -17,7 +17,7 @@ int sizecsv(FILE *file, struct Dimensions *obj) {
         while (token != NULL) {
             token = strtok(NULL, ",");
             if (flag == 0){
-            columns++;
+                columns++;
             }
         }
         if (flag == 0){
@@ -28,20 +28,18 @@ int sizecsv(FILE *file, struct Dimensions *obj) {
     obj->cols = columns;
     obj->rows = rows;
 }
-int** create_matrix(int m, int n) {
-    // Allocate memory for m rows (array of int pointers)
-    int** matrix = (int**)malloc(m * sizeof(int*));
+
+unsigned int** create_matrix(int m, int n) {
+    unsigned int** matrix = (unsigned int**)malloc(m * sizeof(unsigned int*));
     if (matrix == NULL) {
         fprintf(stderr, "Memory allocation failed for rows.\n");
-        return NULL; // Exit if memory allocation fails
+        return NULL; 
     }
 
-    // Allocate memory for n columns in each row
     for (int i = 0; i < m; i++) {
-        matrix[i] = (int*)malloc(n * sizeof(int));
+        matrix[i] = (unsigned int*)malloc(n * sizeof(unsigned int));
         if (matrix[i] == NULL) {
             fprintf(stderr, "Memory allocation failed for columns in row %d.\n", i);
-            // Free previously allocated rows
             for (int j = 0; j < i; j++) {
                 free(matrix[j]);
             }
@@ -51,8 +49,9 @@ int** create_matrix(int m, int n) {
     }
     return matrix;
 }
-void free_matrix(int** matrix, int m) {
-     if (matrix != NULL){
+
+void free_matrix(unsigned int** matrix, int m) {
+    if (matrix != NULL){
         for (int i = 0; i < m; i++) {
             free(matrix[i]);
         }
@@ -60,7 +59,7 @@ void free_matrix(int** matrix, int m) {
     }
 }
 
-void populate_matrix_from_csv(FILE *ptr , int** matrix, int rows, int cols){
+void populate_matrix_from_csv(FILE *ptr , unsigned int** matrix, int rows, int cols){
     char line[1024];
     int rowIndex = 0;
     while (rowIndex < rows && fgets(line, sizeof(line), ptr) != NULL) {
@@ -69,53 +68,36 @@ void populate_matrix_from_csv(FILE *ptr , int** matrix, int rows, int cols){
         int colIndex = 0;
         char *token = strtok(line, ",");
         
-        // Read each token (column)
         while (colIndex < cols && token != NULL) {
-            // Convert the token to an integer
-            int value = atoi(token);
+            unsigned long value = strtoul(token, NULL, 10);  
+            matrix[rowIndex][colIndex] = (unsigned int)value;  
 
-            // Store in the matrix
-            matrix[rowIndex][colIndex] = value;
-
-            // Move to the next token
             token = strtok(NULL, ",");
             colIndex++;
         }
-
-        // Move to the next row
         rowIndex++;
     }
 }
-void print_matrix(int rows, int cols, int** matrix) {
-  for (int i = 0; i < rows; i++) {
-    for (int j = 0; j < cols; j++) {
-      printf("%d ", matrix[i][j]);
+
+void print_matrix(int rows, int cols, unsigned int** matrix) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("%u ", matrix[i][j]);
+        }
+        printf("\n");
     }
-    printf("\n");
-  }
-}
-int min(int a, int b) {
-  return (a < b) ? a : b;
 }
 
-// Returns the maximum of two integers.
-int max(int a, int b) {
-  return (a > b) ? a : b;
-}
-
-double RowMean(int** matrix,int row,int cols){
-    int sum = 0;
-    for (int c=0;c<cols;c++){
+double RowMean(unsigned int** matrix, int row, int cols){
+    unsigned long long sum = 0;
+    for (int c = 0; c < cols; c++){
         sum += matrix[row][c];
     }
-    return sum/(double)cols;
-};
-// given the row return the max in that row.
-int RowMax(int** matrix, int row, int cols) {
-    // Start with the first element of the row
-    int maxVal = matrix[row][0];  
-    
-    // Iterate through the row
+    return sum / (double)cols;
+}
+
+unsigned int RowMax(unsigned int** matrix, int row, int cols) {
+    unsigned int maxVal = matrix[row][0];  
     for (int c = 1; c < cols; c++) {
         if (matrix[row][c] > maxVal) {
             maxVal = matrix[row][c];
@@ -123,11 +105,9 @@ int RowMax(int** matrix, int row, int cols) {
     }
     return maxVal;
 }
-int RowMin(int** matrix, int row, int cols) {
-    // Start with the first element of the row
-    int minVal = matrix[row][0];
-    
-    // Iterate through the row
+
+unsigned int RowMin(unsigned int** matrix, int row, int cols) {
+    unsigned int minVal = matrix[row][0];
     for (int c = 1; c < cols; c++) {
         if (matrix[row][c] < minVal) {
             minVal = matrix[row][c];
@@ -135,18 +115,17 @@ int RowMin(int** matrix, int row, int cols) {
     }
     return minVal;
 }
-double ColMean(int** matrix, int col, int rows) {
-    int sum = 0;
+
+double ColMean(unsigned int** matrix, int col, int rows) {
+    unsigned long long sum = 0;
     for (int r = 0; r < rows; r++) {
         sum += matrix[r][col];
     }
-    // Simple integer division
     return sum / (double)rows;
 }
 
-// Return the maximum value in a given column
-int ColMax(int** matrix, int col, int rows) {
-    int maxVal = matrix[0][col];
+unsigned int ColMax(unsigned int** matrix, int col, int rows) {
+    unsigned int maxVal = matrix[0][col];
     for (int r = 1; r < rows; r++) {
         if (matrix[r][col] > maxVal) {
             maxVal = matrix[r][col];
@@ -155,9 +134,8 @@ int ColMax(int** matrix, int col, int rows) {
     return maxVal;
 }
 
-// Return the minimum value in a given column
-int ColMin(int** matrix, int col, int rows) {
-    int minVal = matrix[0][col];
+unsigned int ColMin(unsigned int** matrix, int col, int rows) {
+    unsigned int minVal = matrix[0][col];
     for (int r = 1; r < rows; r++) {
         if (matrix[r][col] < minVal) {
             minVal = matrix[r][col];
@@ -166,8 +144,8 @@ int ColMin(int** matrix, int col, int rows) {
     return minVal;
 }
 
-void formatOutput(char *file , char *plane, double mean, int max, int min){
-    printf("%s %s %.2f %d %d\n",file,plane,mean,max,min);
+void formatOutput(char *file , char *plane, double mean, unsigned int max, unsigned int min){
+    printf("%s %s %.2f %u %u\n", file, plane, mean, max, min);
 }
 
 int main(int argc, char **argv) {
@@ -175,58 +153,54 @@ int main(int argc, char **argv) {
         printf("Usage: %s <filename.csv> <r|c> <index>\n", argv[0]);
         return -1;
     }
-    FILE *file = fopen(argv[1], "r"); // file passed in 
+    FILE *file = fopen(argv[1], "r"); 
     if (file == NULL) {
-        printf("file not found\n");
+        printf("Error opening file\n");
         return -1;
     }
-    // dir should be a single character: 'r' or 'c'
+
     char dir = argv[2][0];   
-    // plane is 0-based index for row or column
-    int plane = atoi(argv[3]);
+    unsigned int plane = strtoul(argv[3], NULL, 10);
 
     struct Dimensions d1;
-    sizecsv(file,&d1);
-    int** my_matrix = create_matrix(d1.rows, d1.cols);
-    rewind(file); // Moves the file position indicator back to the beginning
+    sizecsv(file, &d1);
+    unsigned int** my_matrix = create_matrix(d1.rows, d1.cols);
+    rewind(file);
     populate_matrix_from_csv(file, my_matrix, d1.rows, d1.cols);
-    // read through csv file again now and assighn values to each row and repeat for # of columns 
+
     if (dir == 'r') {
-        if (plane < 0 || plane >= d1.rows) {
-            printf("error in input format at line %d\n", plane);
+        if (plane >= d1.rows) {
+            printf("error in input format at line %u\n", plane);
             free_matrix(my_matrix, d1.rows);
             fclose(file);
             return -1;
         } else {
-            // It's a valid row
-            int maxVal  = RowMax(my_matrix, plane, d1.cols);
-            int minVal  = RowMin(my_matrix, plane, d1.cols);
+            unsigned int maxVal  = RowMax(my_matrix, plane, d1.cols);
+            unsigned int minVal  = RowMin(my_matrix, plane, d1.cols);
             double meanVal = RowMean(my_matrix, plane, d1.cols);
             formatOutput(argv[1], "row", meanVal, maxVal, minVal);
         }
     } 
     else if (dir == 'c') {
-        if (plane < 0 || plane >= d1.cols) {
-            printf("error in input format at line %d\n", plane);
+        if (plane >= d1.cols) {
+            printf("error in input format at line %u\n", plane);
             free_matrix(my_matrix, d1.rows);
             fclose(file);
             return -1;
         } else {
-            // It's a valid column
-            int maxVal  = ColMax(my_matrix, plane, d1.rows);
-            int minVal  = ColMin(my_matrix, plane, d1.rows);
+            unsigned int maxVal  = ColMax(my_matrix, plane, d1.rows);
+            unsigned int minVal  = ColMin(my_matrix, plane, d1.rows);
             double meanVal = ColMean(my_matrix, plane, d1.rows);
             formatOutput(argv[1], "column", meanVal, maxVal, minVal);
         }
     } 
     else {
-        // If the second argument isn't 'r' or 'c'
         free_matrix(my_matrix, d1.rows);
         fclose(file);
         fprintf(stderr, "error in input format at line 1\n");
         return -1;
     }
     fclose(file);
-    free_matrix(my_matrix,d1.rows);
+    free_matrix(my_matrix, d1.rows);
     return 0;
 }
