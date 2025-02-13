@@ -3,9 +3,9 @@
 CC=gcc
 fileName=pa1.c
 outputName=pa1
-csv=test22.csv
+csv=test2.csv
 plane=c
-value=10
+value=100
 run: build execute
 build:
 	@echo "Building"

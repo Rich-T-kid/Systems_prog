@@ -172,13 +172,12 @@ void formatOutput(char *file , char *plane, double mean, int max, int min){
 
 int main(int argc, char **argv) {
     if (argc < 4) {
-        fprintf(stderr, "Usage: %s <filename.csv> <r|c> <index>\n", argv[0]);
+        printf("Usage: %s <filename.csv> <r|c> <index>\n", argv[0]);
         return -1;
     }
     FILE *file = fopen(argv[1], "r"); // file passed in 
     if (file == NULL) {
-       // perror("Error opening file");
-        //fprintf(stderr, "exit with status -1\n");  // or a more specific message
+        printf("file not found\n");
         return -1;
     }
     // dir should be a single character: 'r' or 'c'
@@ -194,7 +193,7 @@ int main(int argc, char **argv) {
     // read through csv file again now and assighn values to each row and repeat for # of columns 
     if (dir == 'r') {
         if (plane < 0 || plane >= d1.rows) {
-            fprintf(stderr, "error in input format at line %d\n", plane);
+            printf("error in input format at line %d\n", plane);
             free_matrix(my_matrix, d1.rows);
             fclose(file);
             return -1;
@@ -208,7 +207,7 @@ int main(int argc, char **argv) {
     } 
     else if (dir == 'c') {
         if (plane < 0 || plane >= d1.cols) {
-            fprintf(stderr, "error in input format at line %d\n", plane);
+            printf("error in input format at line %d\n", plane);
             free_matrix(my_matrix, d1.rows);
             fclose(file);
             return -1;
