@@ -3,7 +3,7 @@ output = libkernel.so
 flags = -shared -O3
 mathLib = -lm
 
-all: build run
+all: build 
 
 build:
 	gcc $(flags) $(input) -o $(output) $(mathLib)
