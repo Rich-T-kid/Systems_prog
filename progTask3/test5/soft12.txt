@@ -1,0 +1,1 @@
+/root/systems-prog/progTask3/test5/file1.txt
